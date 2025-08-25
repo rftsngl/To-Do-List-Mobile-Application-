@@ -3,64 +3,55 @@
 [![React Native](https://img.shields.io/badge/React%20Native-0.81.0-blue.svg)](https://reactnative.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue.svg)](https://www.typescriptlang.org/)
 [![SQLite](https://img.shields.io/badge/SQLite-react--native--sqlite--storage-green.svg)](https://www.npmjs.com/package/react-native-sqlite-storage)
-[![MIT License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## 📋 İçindekiler
 
 - [Genel Bakış](#-genel-bakış)
-- [Özellikler](#-özellikler)
+- [Mevcut Özellikler](#-mevcut-özellikler)
 - [Teknoloji Stack](#️-teknoloji-stack)
 - [Kurulum](#-kurulum)
-- [Proje Yapısı](#-proje-yapısı)
-- [Veritabanı Şeması](#️-veritabanı-şeması)
-- [Ekran Görüntüleri](#-ekran-görüntüleri)
-- [API Referansı](#-api-referansı)
-- [Geliştirme](#-geliştirme)
-- [Katkıda Bulunma](#-katkıda-bulunma)
-- [Lisans](#-lisans)
+- [Mevcut Proje Yapısı](#-mevcut-proje-yapısı)
+- [Planlanan Geliştirmeler](#-planlanan-geliştirmeler)
+- [Geliştirme Roadmap](#-geliştirme-roadmap)
 
 ## 🚀 Genel Bakış
 
-TodoMobile, modern mobil uygulama geliştirme teknolojileri kullanılarak geliştirilmiş, tam özellikli bir görev yönetim uygulamasıdır. Uygulama, kullanıcıların görevlerini organize etmelerine, önceliklendirmelerine ve takip etmelerine olanak tanır.
+TodoMobile, React Native ve TypeScript kullanılarak geliştirilmiş, offline çalışabilen görev yönetim uygulamasıdır. Clean Architecture prensiplerine uygun olarak tasarlanmış, SQLite ile güçlü yerel veri depolama sağlar.
 
-### Temel Hedefler
+## 🌟 Mevcut Özellikler
 
-- ✨ Modern ve sezgisel kullanıcı arayüzü
-- 📱 Cross-platform mobil deneyim (iOS & Android)
-- 🗃️ Yerel veri depolama ve offline çalışma
-- ⚡ Yüksek performans ve akıcı kullanım
-- 🛠️ Genişletilebilir ve sürdürülebilir kod yapısı
+### ✅ Halihazırda Çalışan Özellikler
 
-## 🌟 Özellikler
+#### Görev Yönetimi
 
-### Görev Yönetimi
-
-- **Görev Oluşturma**: Başlık, açıklama, öncelik ve tarih bilgileri
-- **Durum Takibi**: Todo, İşlemde, Engellendi, Tamamlandı durumları
-- **Öncelik Seviyeleri**: Düşük, Normal, Yüksek, Kritik (0-3)
-- **Alt Görevler**: Görevleri daha küçük parçalara bölme
+- **Görev CRUD İşlemleri**: Oluşturma, okuma, güncelleme, silme
+- **Durum Yönetimi**: Todo, İşlemde, Engellendi, Tamamlandı
+- **Öncelik Sistemi**: 4 seviyeli öncelik (0-3)
+- **Alt Görevler**: Subtask desteği
 - **Tarih Yönetimi**: Başlangıç ve bitiş tarihleri
 
-### Organizasyon
+#### Veri Katmanı
 
-- **Liste Yönetimi**: Görevleri kategorilere ayırma
-- **Etiket Sistemi**: Görevlere çoklu etiket atama
-- **Renk Kodlama**: Liste ve etiketler için renk desteği
-- **Sıralama**: Manuel sıralama ve otomatik sıralama seçenekleri
+- **SQLite Entegrasyonu**: Offline veri depolama
+- **Repository Pattern**: Clean data access layer
+- **Migration Sistemi**: Veritabanı versiyonlama
+- **Type Safety**: Comprehensive TypeScript types
+- **Soft Delete**: Güvenli silme mekanizması
 
-### Kullanıcı Deneyimi
+#### Kullanıcı Arayüzü
 
-- **Tab Navigasyon**: Görevler ve Ayarlar sekmeleri
-- **Modal Ekranlar**: Görev detayları ve yeni görev oluşturma
-- **Tema Desteği**: Açık ve koyu tema seçenekleri
-- **Duyarlı Tasarım**: Farklı ekran boyutlarına uyum
+- **Custom Navigation**: Özel stack ve tab navigasyon
+- **Tema Sistemi**: Light/dark tema desteği
+- **Material Design**: 48dp minimum touch targets
+- **Modal/Sheet Support**: Görev detay ve oluşturma ekranları
+- **Safe Area**: iOS notch ve Android desteği
 
-### Teknik Özellikler
+#### Teknik Altyapı
 
-- **Offline Çalışma**: İnternet bağlantısı olmadan tam işlevsellik
-- **Veri Senkronizasyonu**: Gelecekte online senkronizasyon desteği
-- **Performans Optimizasyonu**: Lazy loading ve verimli render
-- **Hata Yönetimi**: Kapsamlı hata yakalama ve raporlama
+- **Clean Architecture**: Katmanlı mimari
+- **Custom Components**: Yeniden kullanılabilir UI bileşenleri
+- **Performance**: Optimize edilmiş queries
+- **Platform Support**: iOS ve Android uyumluluğu
 
 ## 🛠️ Teknoloji Stack
 
@@ -90,57 +81,78 @@ TodoMobile, modern mobil uygulama geliştirme teknolojileri kullanılarak geliş
 
 ### Platform Desteği
 
-- **Android** - Minimum SDK 21 (Android 5.0)
-- **iOS** - Minimum iOS 11.0
+- **Android** - API 21+ (Android 5.0+)
+- **iOS** - iOS 11.0+ (Xcode 14+ gerekli)
+- **React Native** - 0.81.0 ve üzeri
 
 ## 📦 Kurulum
 
-### Gereksinimler
+### 🔧 Sistem Gereksinimleri
 
-- Node.js 18.0 veya üzeri
-- React Native CLI
-- Android Studio (Android geliştirme için)
-- Xcode (iOS geliştirme için)
+- **Node.js** 18.0 veya üzeri
+- **npm** veya **yarn** paket yöneticisi
+- **React Native CLI** (`npm install -g @react-native-community/cli`)
 
-### Adım Adım Kurulum
+#### Android Geliştirme
 
-1. **Repository'yi klonlayın**
+- **Android Studio** (API 21+ / Android 5.0+)
+- **JDK** 11 veya üzeri
+- **Android SDK** ve **Platform Tools**
+
+#### iOS Geliştirme (macOS gerekli)
+
+- **Xcode** 14+ (iOS 11.0+ desteği)
+- **CocoaPods** (`sudo gem install cocoapods`)
+
+### 🚀 Hızlı Başlangıç
+
+1. **Projeyi klonlayın**
 
    ```bash
-   git clone https://github.com/rftsngl/To-Do-List-Mobile-Application-.git
-   cd To-Do-List-Mobile-Application-
+   git clone [repository-url]
+   cd TodoMobile
    ```
 
 2. **Bağımlılıkları yükleyin**
 
    ```bash
+   # npm kullanıyorsanız
    npm install
+   
+   # yarn kullanıyorsanız  
+   yarn install
    ```
 
-3. **iOS için ek kurulum** (macOS üzerinde)
+3. **iOS için CocoaPods kurulumu** (sadece macOS)
 
    ```bash
    cd ios && pod install && cd ..
    ```
 
-4. **Geliştirme sunucusunu başlatın**
+4. **Geliştirme ortamını başlatın**
 
    ```bash
+   # Metro bundler'ı başlat
    npm start
+   
+   # Yeni terminal açıp uygulamayı çalıştırın
+   npm run android  # Android için
+   npm run ios      # iOS için (macOS gerekli)
    ```
 
-5. **Uygulamayı çalıştırın**
+### 🔍 Doğrulama
 
-   Android için:
-
-   ```bash
-   npm run android
-   ```
-
-   iOS için:
+Kurulum sonrası aşağıdaki komutlarla her şeyin çalıştığından emin olun:
 
    ```bash
-   npm run ios
+# TypeScript tip kontrolü
+npx tsc --noEmit
+
+# Linting
+npm run lint
+
+# Test çalıştırma
+npm test
    ```
 
 ### Paketleme
@@ -158,350 +170,127 @@ cd android
 npx react-native run-ios --configuration Release
 ```
 
-## 📁 Proje Yapısı
+## 📁 Mevcut Proje Yapısı
 
 ```text
 TodoMobile/
-├── android/                 # Android native kodu
-├── ios/                    # iOS native kodu
-├── app/                    # Ana uygulama kodu
+├── app/                    # Presentation Layer
 │   ├── boot/              # Uygulama başlatma
-│   │   └── InitGate.tsx   # Veritabanı başlatma
-│   ├── components/        # Yeniden kullanılabilir bileşenler
-│   │   ├── FAB.tsx       # Floating Action Button
-│   │   ├── ListItem.tsx  # Liste öğesi bileşeni
-│   │   ├── SegmentedControl.tsx
-│   │   └── Sheet.tsx     # Modal sheet bileşeni
-│   ├── navigation/        # Navigasyon sistemi
-│   │   ├── Stack.tsx     # Stack navigator
-│   │   └── Tabs.tsx      # Tab navigator
-│   ├── screens/           # Uygulama ekranları
-│   │   ├── Tasks/        # Görev ekranları
-│   │   │   ├── components/
-│   │   │   │   └── SubtasksPanel.tsx
-│   │   │   ├── NewTaskSheet.tsx
-│   │   │   ├── TaskDetailScreen.tsx
-│   │   │   └── TasksScreen.tsx
-│   │   ├── Settings/     # Ayar ekranları
-│   │   │   ├── ManageLabelsScreen.tsx
-│   │   │   ├── ManageListsScreen.tsx
-│   │   │   └── SettingsScreen.tsx
-│   │   └── DBCheckScreen.tsx
-│   ├── theme/            # Tema ve stil tanımları
-│   │   └── theme.ts
-│   └── utils/            # Yardımcı fonksiyonlar
-│       ├── date.ts       # Tarih işlemleri
-│       └── status.ts     # Durum yönetimi
-├── src/                  # Veri katmanı
-│   └── database/         # Veritabanı yönetimi
-│       ├── db.ts         # Veritabanı manager
-│       ├── id.ts         # ID generation
-│       ├── index.ts      # Dışa aktarma
-│       ├── migrations.ts # Veritabanı migrationları
+│   ├── components/        # UI bileşenleri
+│   ├── navigation/        # Custom navigasyon sistemi
+│   ├── screens/           # Ekranlar (Tasks, Settings)
+│   ├── theme/            # Tema ve stil sistemi
+│   └── utils/            # UI yardımcıları
+├── src/                   # Data Layer
+│   └── database/         # SQLite & Repository pattern
 │       ├── repositories/ # Veri erişim katmanı
-│       │   ├── labels.ts
-│       │   ├── lists.ts
-│       │   ├── subtasks.ts
-│       │   └── tasks.ts
-│       ├── seed.ts       # Test verisi
+│       ├── migrations.ts # Şema versiyonlama
 │       └── types.ts      # TypeScript tipleri
-├── __tests__/            # Test dosyaları
-├── node_modules/         # Bağımlılıklar
-├── App.tsx              # Ana uygulama bileşeni
-├── index.js             # Uygulama giriş noktası
-├── package.json         # Proje yapılandırması
-└── README.md            # Proje dokümantasyonu
+├── android/              # Android native
+├── ios/                  # iOS native
+└── __tests__/            # Test dosyaları
 ```
 
-### Mimari Yaklaşım
-
-Uygulama **Clean Architecture** prensipleri takip ederek geliştirilmiştir:
-
-- **Presentation Layer** (`app/`): UI bileşenleri ve ekranlar
-- **Business Logic Layer** (`src/repositories/`): İş mantığı ve veri işlemleri
-- **Data Layer** (`src/database/`): Veri erişimi ve depolama
-
-## 🗄️ Veritabanı Şeması
-
-### Ana Tablolar
-
-#### Lists Tablosu
-
-```sql
-CREATE TABLE lists (
-  id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
-  color TEXT,
-  created_at INTEGER NOT NULL,
-  updated_at INTEGER NOT NULL,
-  deleted_at INTEGER,
-  version INTEGER NOT NULL DEFAULT 1,
-  dirty INTEGER NOT NULL DEFAULT 0
-);
-```
-
-#### Tasks Tablosu
-
-```sql
-CREATE TABLE tasks (
-  id TEXT PRIMARY KEY,
-  list_id TEXT NOT NULL,
-  title TEXT NOT NULL,
-  description TEXT,
-  status TEXT NOT NULL CHECK (status IN ('todo', 'in_progress', 'blocked', 'done')),
-  priority INTEGER NOT NULL CHECK (priority IN (0, 1, 2, 3)),
-  start_date INTEGER,
-  due_date INTEGER,
-  completed_at INTEGER,
-  created_at INTEGER NOT NULL,
-  updated_at INTEGER NOT NULL,
-  deleted_at INTEGER,
-  version INTEGER NOT NULL DEFAULT 1,
-  dirty INTEGER NOT NULL DEFAULT 0,
-  sort_order INTEGER,
-  FOREIGN KEY (list_id) REFERENCES lists(id)
-);
-```
-
-#### Labels Tablosu
-
-```sql
-CREATE TABLE labels (
-  id TEXT PRIMARY KEY,
-  name TEXT NOT NULL UNIQUE,
-  color TEXT,
-  created_at INTEGER NOT NULL,
-  updated_at INTEGER NOT NULL,
-  deleted_at INTEGER,
-  version INTEGER NOT NULL DEFAULT 1,
-  dirty INTEGER NOT NULL DEFAULT 0
-);
-```
-
-#### Task_Labels İlişki Tablosu
-
-```sql
-CREATE TABLE task_labels (
-  task_id TEXT NOT NULL,
-  label_id TEXT NOT NULL,
-  PRIMARY KEY (task_id, label_id),
-  FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE,
-  FOREIGN KEY (label_id) REFERENCES labels(id) ON DELETE CASCADE
-);
-```
-
-#### Subtasks Tablosu
-
-```sql
-CREATE TABLE subtasks (
-  id TEXT PRIMARY KEY,
-  task_id TEXT NOT NULL,
-  title TEXT NOT NULL,
-  done INTEGER NOT NULL DEFAULT 0,
-  sort_order INTEGER,
-  created_at INTEGER NOT NULL,
-  updated_at INTEGER NOT NULL,
-  deleted_at INTEGER,
-  version INTEGER NOT NULL DEFAULT 1,
-  dirty INTEGER NOT NULL DEFAULT 0,
-  FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
-);
-```
-
-### İndeksler ve Optimizasyonlar
-
-```sql
--- Performans için önemli indeksler
-CREATE INDEX idx_tasks_list_id ON tasks(list_id);
-CREATE INDEX idx_tasks_status ON tasks(status);
-CREATE INDEX idx_tasks_due_date ON tasks(due_date);
-CREATE INDEX idx_subtasks_task_id ON subtasks(task_id);
-CREATE INDEX idx_task_labels_task_id ON task_labels(task_id);
-CREATE INDEX idx_task_labels_label_id ON task_labels(label_id);
-```
+### Mevcut Mimari
 
-### Veri Tipleri
+- **Clean Architecture**: Katmanlı separation of concerns
+- **Repository Pattern**: Data access abstraction
+- **Custom Navigation**: Minimal dependencies
+- **Theme System**: Design system altyapısı
 
-#### TaskStatus Enum
+## 🚀 Planlanan Geliştirmeler
 
-- `todo`: Yapılacak
-- `in_progress`: İşlemde
-- `blocked`: Engellendi
-- `done`: Tamamlandı
+### 🎯 Geliştirme Planı
 
-#### TaskPriority Seviyeleri
+Bu uygulama, mevcut kodu bozmadan kademeli refaktör, temizlik ve ölçeklenebilirlik artışı sağlayacak 6 sprint'lik bir geliştirme sürecine hazır. Her sprint sonunda çalışır bir sürüm, ölçülebilir çıktılar ve geri dönüş noktası bulunacak.
 
-- `0`: Düşük öncelik
-- `1`: Normal öncelik
-- `2`: Yüksek öncelik
-- `3`: Kritik öncelik
+### ⚡ Kısa Vadeli İyileştirmeler (2-4 hafta)
 
-## 📸 Ekran Görüntüleri
+#### 🔧 Sprint 0: Hazırlık ve Zemin (2-3 gün)
 
-> **Not**: Ekran görüntüleri ekleme sürecindedir.
+- **Git Workflow**: Protected branches (main/develop)
+- **CI/CD**: TypeScript strict mode, ESLint, test automation
+- **Developer Experience**: Path aliases, Metro resolver optimization
+- **Kod Kalitesi**: Strict TypeScript, enhanced linting rules
 
-| Ana Ekran | Görev Detayı | Ayarlar |
-|-----------|--------------|---------|
-| Coming Soon | Coming Soon | Coming Soon |
+#### 🎪 Sprint 1: State Management & Error Handling (1 hafta)
 
-## 📚 API Referansı
+- **Global State**: Zustand entegrasyonu (Tasks, Settings, UI stores)
+- **Error Boundaries**: Kontrollü hata yönetimi ve user-friendly error screens
+- **Loading States**: Merkezi loading, skeleton screens, boş durum patterns
+- **Prop Drilling**: Global state ile prop drilling elimiasyonu
 
-### Task Repository
+#### 📁 Sprint 2: Feature-Based Architecture (1 hafta)
 
-#### Görev İşlemleri
+- **Reorganization**: Feature-based folder structure
+- **Module Separation**: `app/features/{tasks,settings,labels}`
+- **Shared Components**: `app/components/{common,forms,feedback}`
+- **Path Optimization**: Import path sadeleştirme ve cleanup
 
-```typescript
-// Tüm görevleri getir
-const tasks = await TaskRepository.getAll();
+### 🔮 Orta Vadeli Geliştirmeler (1-2 ay)
 
-// ID ile görev getir
-const task = await TaskRepository.getById('task-id');
+#### 🧭 Sprint 3: Enhanced Navigation (1 hafta)
 
-// Yeni görev oluştur
-const newTask = await TaskRepository.create({
-  title: 'Yeni Görev',
-  listId: 'list-id',
-  status: 'todo',
-  priority: 1
-});
+- **Type-Safe Routes**: Route mapping ve parametre modelleri
+- **Deep Linking**: URI-based navigation support
+- **Animation System**: Modal/sheet transitions
+- **Navigation State**: Merkezi navigation state yönetimi
 
-// Görev güncelle
-await TaskRepository.update('task-id', {
-  title: 'Güncellenmiş Görev',
-  status: 'done'
-});
+#### ⚡ Sprint 4: Performance & Database (1 hafta)
 
-// Görev sil
-await TaskRepository.delete('task-id');
-```
+- **List Virtualization**: Büyük liste optimizasyonu
+- **Database Optimization**: Batch operations, indexing, query memoization
+- **Bundle Optimization**: Tree-shaking, lazy loading, asset compression
+- **Memory Management**: Render optimization ve memory leak prevention
 
-### List Repository
+#### 🧪 Sprint 5: Testing Infrastructure (1 hafta)
 
-```typescript
-// Liste oluştur
-const list = await ListRepository.create({
-  name: 'İş Görevleri',
-  color: '#FF5722'
-});
+- **Unit Testing**: Jest setup, utility functions, custom hooks
+- **Integration Testing**: React Native Testing Library
+- **E2E Testing**: Detox ile smoke tests
+- **CI Integration**: Automated test pipeline
 
-// Listeye göre görevleri getir
-const tasks = await TaskRepository.getByListId('list-id');
-```
+### 🌟 Uzun Vadeli Hedefler (3+ ay)
 
-### Label Repository
+#### 📚 Sprint 6: Developer Experience (3-4 gün)
 
-```typescript
-// Etiket oluştur
-const label = await LabelRepository.create({
-  name: 'Acil',
-  color: '#F44336'
-});
+- **Storybook**: Component isolation ve development
+- **Documentation**: Architecture decision records, contributor guide
+- **Conventional Commits**: Automated changelog generation
+- **Code Quality**: Advanced linting, formatting standards
 
-// Göreve etiket ata
-await TaskRepository.addLabel('task-id', 'label-id');
-```
+## 📊 Geliştirme Roadmap
 
-## 🔧 Geliştirme
+### 🎯 Ölçütler ve Hedefler
 
-### Kod Kalitesi
+**Takip Edilecek Metrikler:**
 
-```bash
-# Linting
-npm run lint
+- ⚡ İlk boyama süresi (First Paint)
+- 📱 JS Bundle boyutu
+- 🎞️ Liste kaydırma performansı (Frame drops)
+- 🎯 Test kapsam yüzdesi
+- 🔍 İlk içerik süresi (First Contentful Paint)
 
-# Formatting
-npx prettier --write .
+**Risk Yönetimi:**
 
-# Type checking
-npx tsc --noEmit
-```
+- 💾 Database migration stratejisi
+- 🔄 Atomik refactor adımları  
+- 🛡️ Feature flag desteği
+- ↩️ Geri dönüş planları
 
-### Testing
+**Beklenen Son Durum:**
 
-```bash
-# Unit testleri çalıştır
-npm test
+- 🏗️ Feature-based modular architecture
+- 🔄 Global state management
+- 🧭 Type-safe navigation
+- ⚡ Performance optimizations
+- 🧪 Comprehensive testing
+- 👥 Enhanced developer experience
 
-# Test coverage
-npm test -- --coverage
-```
+### 🚀 Başlamaya Hazır
 
-### Debugging
-
-1. **React Native Debugger** kullanın
-2. **Console logging** için `console.log()` ekleyin
-3. **Database debugging** için DB Check ekranını kullanın
-
-### Environment Configuration
-
-Geliştirme ortamı için `.env` dosyası oluşturun:
-
-```env
-NODE_ENV=development
-DEBUG=true
-```
-
-## 🤝 Katkıda Bulunma
-
-### Katkı Süreci
-
-1. Bu repository'yi fork edin
-2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
-3. Değişikliklerinizi commit edin (`git commit -m 'Add some amazing feature'`)
-4. Branch'inizi push edin (`git push origin feature/amazing-feature`)
-5. Pull Request oluşturun
-
-### Kod Standartları
-
-- **TypeScript** kullanın
-- **ESLint** kurallarına uyun
-- **Prettier** ile kodu formatlayın
-- Değişiklikler için **test** yazın
-- **Meaningful commit messages** kullanın
-
-### İssue Raporlama
-
-Bug raporu veya feature request için GitHub Issues kullanın:
-
-1. Detaylı açıklama yapın
-2. Reproduction steps ekleyin
-3. Platform bilgilerini belirtin
-4. Ekran görüntüsü ekleyin (gerekiyorsa)
-
-## 📄 Lisans
-
-Bu proje MIT Lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasını inceleyin.
-
-```text
-MIT License
-
-Copyright (c) 2025 Rıfat Sinanoğlu
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
-
-## 📞 İletişim
-
-- **Geliştirici**: Rıfat Sinanoğlu
-- **GitHub**: [@rftsngl](https://github.com/rftsngl)
-- **LinkedIn**: [linkedin.com/in/rftsngl](https://linkedin.com/in/rftsngl)
+Her sprint bağımsız değer üretecek şekilde tasarlandı. Yeni özellik ekleme, mevcut feature/* pattern ile sadeleşecek.
 
 ---
 
-**⭐ Bu projeyi beğendiyseniz yıldız vermeyi unutmayın!**
+**💡 Bu roadmap living document olarak güncellenecek ve community feedback'ine göre revize edilecektir.**
