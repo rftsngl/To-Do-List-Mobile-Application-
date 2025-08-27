@@ -55,11 +55,8 @@ function AppContent() {
   };
 
   const handleTaskMenu = (taskId: string) => {
-    // Task menü işlemleri (3-nokta menüsü)
-    console.log('Task menu:', taskId);
-    // Burada ActionSheet veya modal menü gösterilebilir
-    // Şimdilik direkt detaya git
-    handleTaskPress(taskId);
+    // Task menüsü artık TasksScreen içinde yönetiliyor
+    // Bu fonksiyon artık kullanılmıyor
   };
 
   const handleNewTask = () => {

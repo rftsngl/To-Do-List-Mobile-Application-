@@ -20,6 +20,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SegmentedControl, defaultSegmentOptions, type SegmentOption } from '../../components/SegmentedControl';
 import { FAB } from '../../components/FAB';
 import { ListItem } from '../../components/ListItem';
+import { TaskActionSheet } from '../../components/TaskActionSheet';
 
 // Database
 import {
@@ -58,6 +59,8 @@ export const TasksScreen: React.FC<TasksScreenProps> = ({
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [actionSheetVisible, setActionSheetVisible] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
 
   // Görevleri yükle
   const loadTasks = useCallback(async () => {
@@ -255,6 +258,70 @@ export const TasksScreen: React.FC<TasksScreenProps> = ({
     }
   }, [tasks, loadTasks]);
 
+  // Task menüsünü aç
+  const handleTaskMenu = useCallback((taskId: string) => {
+    setSelectedTaskId(taskId);
+    setActionSheetVisible(true);
+  }, []);
+
+  // Action sheet'i kapat
+  const handleCloseActionSheet = useCallback(() => {
+    setActionSheetVisible(false);
+    setSelectedTaskId(null);
+  }, []);
+
+  // Görev düzenle
+  const handleEditTask = useCallback((taskId: string) => {
+    onTaskPress(taskId); // Görev detayına git
+  }, [onTaskPress]);
+
+  // Görev sil
+  const handleDeleteTask = useCallback(async (taskId: string) => {
+    try {
+      await TasksRepository.delete(taskId);
+      await loadTasks();
+    } catch (err) {
+      console.error('[TasksScreen] Delete task hatası:', err);
+      Alert.alert('Hata', 'Görev silinirken bir hata oluştu.');
+    }
+  }, [loadTasks]);
+
+  // Görev kopyala
+  const handleDuplicateTask = useCallback(async (taskId: string) => {
+    try {
+      const task = tasks.find(t => t.id === taskId);
+      if (!task) return;
+
+      const newTask = await TasksRepository.create({
+        list_id: task.list_id,
+        title: `${task.title} (Kopya)`,
+        description: task.description,
+        status: 'todo' as any,
+        priority: task.priority,
+        start_date: task.start_date,
+        due_date: task.due_date,
+      });
+
+      await loadTasks();
+      Alert.alert('Başarılı', 'Görev kopyalandı.');
+    } catch (err) {
+      console.error('[TasksScreen] Duplicate task hatası:', err);
+      Alert.alert('Hata', 'Görev kopyalanırken bir hata oluştu.');
+    }
+  }, [tasks, loadTasks]);
+
+  // Görev paylaş
+  const handleShareTask = useCallback((taskId: string) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+
+    // Basit metin paylaşımı
+    const shareText = `Görev: ${task.title}\n${task.description ? `Açıklama: ${task.description}\n` : ''}Durum: ${task.status}`;
+    
+    // Burada gerçek paylaşım implementasyonu olabilir
+    Alert.alert('Paylaş', shareText);
+  }, [tasks]);
+
   // Segment değişikliği
   const handleSegmentChange = useCallback((segment: SegmentOption) => {
     setSelectedSegment(segment);
@@ -270,12 +337,12 @@ export const TasksScreen: React.FC<TasksScreenProps> = ({
     <ListItem
       task={item}
       onToggleComplete={handleToggleComplete}
-      onMenuPress={onTaskMenu}
+      onMenuPress={handleTaskMenu}
       onPress={onTaskPress}
       showPriority={true}
       showStatus={selectedSegment === 'All' || selectedSegment === 'Done'}
     />
-  ), [handleToggleComplete, onTaskMenu, onTaskPress, selectedSegment]);
+  ), [handleToggleComplete, handleTaskMenu, onTaskPress, selectedSegment]);
 
   // Boş liste
   const renderEmpty = useCallback(() => (
@@ -396,6 +463,18 @@ export const TasksScreen: React.FC<TasksScreenProps> = ({
       <FAB
         onPress={onNewTask}
         disabled={loading}
+      />
+
+      {/* Task Action Sheet */}
+      <TaskActionSheet
+        isVisible={actionSheetVisible}
+        onClose={handleCloseActionSheet}
+        task={selectedTaskId ? tasks.find(t => t.id === selectedTaskId) || null : null}
+        onEdit={handleEditTask}
+        onDelete={handleDeleteTask}
+        onToggleComplete={handleToggleComplete}
+        onDuplicate={handleDuplicateTask}
+        onShare={handleShareTask}
       />
     </View>
   );
