@@ -12,6 +12,7 @@ import {
   StyleSheet,
   Alert,
   ScrollView,
+  Dimensions,
 } from 'react-native';
 
 // Components
@@ -32,6 +33,8 @@ import { getAllPriorities } from '../../utils/status';
 
 // Theme
 import { lightTheme, getPriorityColor } from '../../theme/theme';
+
+const { height: screenHeight } = Dimensions.get('window');
 
 interface NewTaskSheetProps {
   isVisible: boolean;
@@ -124,6 +127,52 @@ export const NewTaskSheet: React.FC<NewTaskSheetProps> = ({
     updateField('label_ids', newLabels);
   };
 
+  // Tarih formatı işleme (DD-MM-YYYY formatında giriş)
+  const handleDateChange = (value: string) => {
+    // Sadece sayı girişine izin ver
+    const numbersOnly = value.replace(/[^0-9]/g, '');
+    
+    // Formatı otomatik ekle: DD-MM-YYYY
+    let formatted = '';
+    if (numbersOnly.length > 0) {
+      // İlk 2 karakter: gün
+      formatted = numbersOnly.substring(0, 2);
+      
+      if (numbersOnly.length > 2) {
+        // 3-4. karakter: ay
+        formatted += '-' + numbersOnly.substring(2, 4);
+        
+        if (numbersOnly.length > 4) {
+          // 5-8. karakter: yıl
+          formatted += '-' + numbersOnly.substring(4, 8);
+        }
+      }
+    }
+    
+    updateField('due_date', formatted);
+  };
+
+  // DD-MM-YYYY formatını YYYY-MM-DD'ye çevir
+  const convertDateFormat = (ddmmyyyy: string): string | null => {
+    if (!ddmmyyyy || ddmmyyyy.length !== 10) return null;
+    
+    const parts = ddmmyyyy.split('-');
+    if (parts.length !== 3) return null;
+    
+    const [day, month, year] = parts;
+    
+    // Basit validasyon
+    const dayNum = parseInt(day, 10);
+    const monthNum = parseInt(month, 10);
+    const yearNum = parseInt(year, 10);
+    
+    if (dayNum < 1 || dayNum > 31 || monthNum < 1 || monthNum > 12 || yearNum < 2000) {
+      return null;
+    }
+    
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  };
+
   // Form validasyon
   const validateForm = (): boolean => {
     const newErrors: {[key: string]: string} = {};
@@ -133,14 +182,14 @@ export const NewTaskSheet: React.FC<NewTaskSheetProps> = ({
       newErrors.title = 'Görev başlığı gerekli';
     }
 
-    // Liste seçimi zorunlu
-    if (!formData.list_id) {
-      newErrors.list_id = 'Liste seçimi gerekli';
-    }
+    // Liste seçimi artık zorunlu değil
+    // if (!formData.list_id) {
+    //   newErrors.list_id = 'Liste seçimi gerekli';
+    // }
 
-    // Tarih formatı kontrolü
-    if (formData.due_date && !parseDateYYYYMMDD(formData.due_date)) {
-      newErrors.due_date = 'Geçersiz tarih formatı (YYYY-MM-DD)';
+    // Tarih formatı kontrolü (DD-MM-YYYY formatı)
+    if (formData.due_date && !convertDateFormat(formData.due_date)) {
+      newErrors.due_date = 'Geçersiz tarih formatı (DD-MM-YYYY)';
     }
 
     setErrors(newErrors);
@@ -157,12 +206,13 @@ export const NewTaskSheet: React.FC<NewTaskSheetProps> = ({
 
     try {
       // Görevi oluştur
+      const convertedDate = formData.due_date ? convertDateFormat(formData.due_date) : null;
       const taskData = {
-        list_id: formData.list_id,
+        list_id: formData.list_id || null, // Liste seçimi artık opsiyonel
         title: formData.title.trim(),
         description: formData.description.trim() || null,
         priority: formData.priority as any,
-        due_date: formData.due_date ? parseDateYYYYMMDD(formData.due_date) : null,
+        due_date: convertedDate ? parseDateYYYYMMDD(convertedDate) : null,
         status: 'todo' as const,
       };
 
@@ -222,8 +272,8 @@ export const NewTaskSheet: React.FC<NewTaskSheetProps> = ({
     <SheetWithHeader
       isVisible={isVisible}
       onClose={handleClose}
-      title="Yeni Görev"
-      height={650}
+      title="Yeni Görev Oluştur"
+      height={screenHeight * 0.74}
     >
       <ScrollView 
         style={styles.form}
@@ -277,8 +327,8 @@ export const NewTaskSheet: React.FC<NewTaskSheetProps> = ({
               errors.due_date && styles.inputError
             ]}
             value={formData.due_date}
-            onChangeText={(value) => updateField('due_date', value)}
-            placeholder="YYYY-MM-DD (örn: 2024-12-31)"
+            onChangeText={handleDateChange}
+            placeholder="15-01-2025"
             placeholderTextColor={lightTheme.colors.textTertiary}
             maxLength={10}
             keyboardType="numeric"
@@ -322,9 +372,14 @@ export const NewTaskSheet: React.FC<NewTaskSheetProps> = ({
 
         {/* Liste Seçimi */}
         <View style={styles.field}>
-          <Text style={styles.label}>
-            Liste <Text style={styles.required}>*</Text>
-          </Text>
+          <View style={styles.fieldHeader}>
+            <Text style={styles.label}>
+              Liste
+            </Text>
+            <TouchableOpacity style={styles.addButton} onPress={() => {}}>
+              <Text style={styles.addButtonText}>+ Liste Ekle</Text>
+            </TouchableOpacity>
+          </View>
           <View style={styles.listContainer}>
             {lists.map((list) => (
               <TouchableOpacity
@@ -354,9 +409,14 @@ export const NewTaskSheet: React.FC<NewTaskSheetProps> = ({
         </View>
 
         {/* Etiketler */}
-        {labels.length > 0 && (
-          <View style={styles.field}>
+        <View style={styles.field}>
+          <View style={styles.fieldHeader}>
             <Text style={styles.label}>Etiketler</Text>
+            <TouchableOpacity style={styles.addButton} onPress={() => {}}>
+              <Text style={styles.addButtonText}>+ Etiket Ekle</Text>
+            </TouchableOpacity>
+          </View>
+          {labels.length > 0 && (
             <View style={styles.labelsContainer}>
               {labels.map((label) => {
                 const isSelected = formData.label_ids.includes(label.id);
@@ -387,8 +447,8 @@ export const NewTaskSheet: React.FC<NewTaskSheetProps> = ({
                 );
               })}
             </View>
-          </View>
-        )}
+          )}
+        </View>
 
         {/* Kaydet Butonu */}
         <View style={styles.actions}>
@@ -417,6 +477,25 @@ const styles = StyleSheet.create({
   },
   field: {
     marginBottom: lightTheme.spacing.lg,
+  },
+  fieldHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: lightTheme.spacing.sm,
+  },
+  addButton: {
+    paddingHorizontal: lightTheme.spacing.sm,
+    paddingVertical: 4,
+    backgroundColor: lightTheme.colors.primary + '15',
+    borderRadius: lightTheme.ui.borderRadius.sm,
+    borderWidth: 1,
+    borderColor: lightTheme.colors.primary + '30',
+  },
+  addButtonText: {
+    ...lightTheme.typography.labelSmall,
+    color: lightTheme.colors.primary,
+    fontWeight: '500',
   },
   label: {
     ...lightTheme.typography.label,
