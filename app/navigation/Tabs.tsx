@@ -22,6 +22,14 @@ interface TabContextType {
   setActiveTab: (tab: TabName) => void;
 }
 
+// Global tab state
+let globalActiveTab: TabName = 'Tasks';
+
+// Global helper function to set current tab
+export const setGlobalActiveTab = (tab: TabName) => {
+  globalActiveTab = tab;
+};
+
 // Tab context
 const TabContext = createContext<TabContextType | null>(null);
 
@@ -44,12 +52,17 @@ export const TabNavigator: React.FC<TabNavigatorProps> = ({
   initialTab = 'Tasks',
   children,
 }) => {
-  const [activeTab, setActiveTab] = useState<TabName>(initialTab);
+  const [activeTab, setActiveTab] = useState<TabName>(globalActiveTab || initialTab);
+
+  const handleSetActiveTab = (tab: TabName) => {
+    globalActiveTab = tab;
+    setActiveTab(tab);
+  };
   const safeAreaInsets = useSafeAreaInsets();
 
   const tabValue: TabContextType = {
     activeTab,
-    setActiveTab,
+    setActiveTab: handleSetActiveTab,
   };
 
   const tabs: { name: TabName; label: string; icon: string }[] = [
@@ -77,7 +90,7 @@ export const TabNavigator: React.FC<TabNavigatorProps> = ({
                 styles.tabButton,
                 activeTab === tab.name && styles.tabButtonActive
               ]}
-              onPress={() => setActiveTab(tab.name)}
+              onPress={() => handleSetActiveTab(tab.name)}
               activeOpacity={0.7}
             >
               <View style={styles.tabContent}>

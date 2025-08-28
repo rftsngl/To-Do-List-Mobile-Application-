@@ -266,18 +266,12 @@ export const ManageListsScreen: React.FC = () => {
     const isEditing = editingList?.id === item.id;
     
     return (
-      <View style={styles.listItem}>
-        {/* Sol taraf - Renk indicator */}
-        <View style={[
-          styles.colorIndicator,
-          { backgroundColor: item.color || lightTheme.colors.primary }
-        ]} />
-
-        {/* Orta - İçerik */}
-        <View style={styles.listContent}>
+      <View style={styles.listCard}>
+        {/* İçerik */}
           {isEditing ? (
             // Düzenleme modu
             <View style={styles.editForm}>
+              <Text style={styles.editTitle}>Liste Düzenle</Text>
               <TextInput
                 style={styles.editNameInput}
                 value={editingList?.name}
@@ -290,6 +284,7 @@ export const ManageListsScreen: React.FC = () => {
               />
               
               {/* Renk seçici */}
+              <Text style={styles.colorPickerLabel}>Renk:</Text>
               <View style={styles.colorPicker}>
                 {COLOR_PALETTE.map((color) => (
                   <TouchableOpacity
@@ -325,38 +320,65 @@ export const ManageListsScreen: React.FC = () => {
             </View>
           ) : (
             // Normal görünüm
-            <View>
-              <Text style={styles.listName}>{item.name}</Text>
-              <Text style={styles.listStats}>
-                {item.task_count} görev
-                {item.completed_count > 0 && ` • ${item.completed_count} tamamlandı`}
-              </Text>
-            </View>
-          )}
-        </View>
+            <>
+              <View style={styles.listCardHeader}>
+                <View style={styles.listInfo}>
+                  <View style={[
+                    styles.colorIndicator,
+                    { backgroundColor: item.color || lightTheme.colors.primary }
+                  ]} />
+                  <View style={styles.listContent}>
+                    <Text style={styles.listName}>{item.name}</Text>
+                    <Text style={styles.listStats}>
+                      {item.task_count} görev
+                      {item.completed_count > 0 && ` • ${item.completed_count} tamamlandı`}
+                    </Text>
+                  </View>
+                </View>
+                
+                <View style={styles.listActions}>
+                  <TouchableOpacity
+                    style={styles.actionButton}
+                    onPress={() => setEditingList({
+                      id: item.id,
+                      name: item.name,
+                      color: item.color,
+                    })}
+                  >
+                    <Text style={styles.actionButtonText}>✏️</Text>
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity
+                    style={styles.actionButton}
+                    onPress={() => handleDeleteList(item)}
+                  >
+                    <Text style={styles.actionButtonText}>🗑</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
 
-        {/* Sağ taraf - Aksiyon butonları */}
-        {!isEditing && (
-          <View style={styles.listActions}>
-            <TouchableOpacity
-              style={styles.actionButton}
-              onPress={() => setEditingList({
-                id: item.id,
-                name: item.name,
-                color: item.color,
-              })}
-            >
-              <Text style={styles.actionButtonText}>✏️</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={styles.actionButton}
-              onPress={() => handleDeleteList(item)}
-            >
-              <Text style={styles.actionButtonText}>🗑</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+              {/* Progress bar */}
+              {item.task_count > 0 && (
+                <View style={styles.progressContainer}>
+                  <View style={styles.progressBar}>
+                    <View 
+                      style={[
+                        styles.progressFill,
+                        { 
+                          width: `${(item.completed_count / item.task_count) * 100}%`,
+                          backgroundColor: item.color || lightTheme.colors.primary 
+                        }
+                      ]} 
+                    />
+                  </View>
+                  <Text style={styles.progressText}>
+                    {Math.round((item.completed_count / item.task_count) * 100)}%
+                  </Text>
+                </View>
+              )}
+            </>
+          )}
+        }
       </View>
     );
   };
@@ -421,7 +443,10 @@ export const ManageListsScreen: React.FC = () => {
           renderItem={renderListItem}
           keyExtractor={(item) => item.id}
           style={styles.list}
-          contentContainerStyle={lists.length === 0 ? styles.listEmpty : undefined}
+          contentContainerStyle={[
+            { paddingBottom: lightTheme.spacing.lg },
+            lists.length === 0 ? styles.listEmpty : undefined
+          ]}
           ListEmptyComponent={renderEmpty}
           showsVerticalScrollIndicator={false}
         />
@@ -577,20 +602,28 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 24,
   },
-  listItem: {
+  listCard: {
+    backgroundColor: lightTheme.colors.surface,
+    borderRadius: lightTheme.ui.borderRadius.lg,
+    marginHorizontal: lightTheme.spacing.md,
+    marginVertical: lightTheme.spacing.sm,
+    padding: lightTheme.spacing.md,
+    ...lightTheme.ui.shadow.sm,
+  },
+  listCardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: lightTheme.colors.surface,
-    paddingVertical: lightTheme.spacing.md,
-    paddingHorizontal: lightTheme.spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: lightTheme.colors.border,
-    minHeight: 72,
+    justifyContent: 'space-between',
+  },
+  listInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
   colorIndicator: {
-    width: 4,
-    height: 48,
-    borderRadius: 2,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
     marginRight: lightTheme.spacing.md,
   },
   listContent: {
@@ -610,6 +643,42 @@ const styles = StyleSheet.create({
   listActions: {
     flexDirection: 'row',
     gap: lightTheme.spacing.sm,
+  },
+  progressContainer: {
+    marginTop: lightTheme.spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: lightTheme.spacing.sm,
+  },
+  progressBar: {
+    flex: 1,
+    height: 6,
+    backgroundColor: lightTheme.colors.border,
+    borderRadius: 3,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    height: '100%',
+    borderRadius: 3,
+  },
+  progressText: {
+    ...lightTheme.typography.bodySmall,
+    color: lightTheme.colors.textSecondary,
+    fontWeight: '600',
+    minWidth: 35,
+  },
+  editTitle: {
+    ...lightTheme.typography.h4,
+    color: lightTheme.colors.text,
+    marginBottom: lightTheme.spacing.md,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  colorPickerLabel: {
+    ...lightTheme.typography.label,
+    color: lightTheme.colors.text,
+    marginBottom: lightTheme.spacing.sm,
+    marginTop: lightTheme.spacing.md,
   },
   actionButton: {
     width: 40,

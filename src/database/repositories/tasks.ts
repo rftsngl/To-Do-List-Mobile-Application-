@@ -35,7 +35,7 @@ export class TasksRepository {
    * Yeni görev oluştur
    */
   static async create(data: {
-    list_id: string;
+    list_id: string | null;
     title: string;
     description?: string | null;
     status?: TaskStatus;
@@ -230,6 +230,38 @@ export class TasksRepository {
       return await DatabaseManager.queryAll<Task>(sql, params);
     } catch (error) {
       throw new Error(`Liste görevleri getirme hatası: ${error}`);
+    }
+  }
+
+  /**
+   * Tüm görevleri getir (liste ID'si null olanlar dahil)
+   */
+  static async getAll(options?: PagingOptions & { includeCompleted?: boolean }): Promise<Task[]> {
+    const includeCompleted = options?.includeCompleted !== false;
+    const statusFilter = includeCompleted ? '' : "AND status != 'done'";
+    
+    let sql = `
+      SELECT * FROM tasks 
+      WHERE deleted_at IS NULL ${statusFilter}
+      ${this.getDefaultOrderBy()}
+    `;
+
+    const params: string[] = [];
+
+    if (options?.limit) {
+      sql += ' LIMIT ?';
+      params.push(options.limit.toString());
+      
+      if (options.offset) {
+        sql += ' OFFSET ?';
+        params.push(options.offset.toString());
+      }
+    }
+
+    try {
+      return await DatabaseManager.queryAll<Task>(sql, params);
+    } catch (error) {
+      throw new Error(`Tüm görevleri getirme hatası: ${error}`);
     }
   }
 

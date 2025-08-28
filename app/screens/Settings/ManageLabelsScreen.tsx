@@ -203,18 +203,12 @@ export const ManageLabelsScreen: React.FC = () => {
     const isEditing = editingLabel?.id === item.id;
     
     return (
-      <View style={styles.labelItem}>
-        {/* Sol taraf - Renk chip */}
-        <View style={[
-          styles.colorChip,
-          { backgroundColor: item.color || lightTheme.colors.primary }
-        ]} />
-
-        {/* Orta - İçerik */}
-        <View style={styles.labelContent}>
+      <View style={styles.labelCard}>
+        {/* İçerik */}
           {isEditing ? (
             // Düzenleme modu
             <View style={styles.editForm}>
+              <Text style={styles.editTitle}>Etiket Düzenle</Text>
               <TextInput
                 style={styles.editNameInput}
                 value={editingLabel?.name}
@@ -227,6 +221,7 @@ export const ManageLabelsScreen: React.FC = () => {
               />
               
               {/* Renk seçici */}
+              <Text style={styles.colorPickerLabel}>Renk:</Text>
               <View style={styles.colorPicker}>
                 {COLOR_PALETTE.map((color) => (
                   <TouchableOpacity
@@ -262,40 +257,45 @@ export const ManageLabelsScreen: React.FC = () => {
             </View>
           ) : (
             // Normal görünüm
-            <View>
-              <Text style={styles.labelName}>{item.name}</Text>
-              <Text style={styles.labelStats}>
-                {item.task_count === 0 
-                  ? 'Hiç görevde kullanılmıyor'
-                  : `${item.task_count} görevde kullanılıyor`
-                }
-              </Text>
+            <View style={styles.labelCardHeader}>
+              <View style={styles.labelInfo}>
+                <View style={[
+                  styles.colorChip,
+                  { backgroundColor: item.color || lightTheme.colors.primary }
+                ]} />
+                <View style={styles.labelContent}>
+                  <Text style={styles.labelName}>{item.name}</Text>
+                  <Text style={styles.labelStats}>
+                    {item.task_count === 0 
+                      ? 'Hiç görevde kullanılmıyor'
+                      : `${item.task_count} görevde kullanılıyor`
+                    }
+                  </Text>
+                </View>
+              </View>
+              
+              <View style={styles.labelActions}>
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={() => setEditingLabel({
+                    id: item.id,
+                    name: item.name,
+                    color: item.color,
+                  })}
+                >
+                  <Text style={styles.actionButtonText}>✏️</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={() => handleDeleteLabel(item)}
+                >
+                  <Text style={styles.actionButtonText}>🗑</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           )}
-        </View>
-
-        {/* Sağ taraf - Aksiyon butonları */}
-        {!isEditing && (
-          <View style={styles.labelActions}>
-            <TouchableOpacity
-              style={styles.actionButton}
-              onPress={() => setEditingLabel({
-                id: item.id,
-                name: item.name,
-                color: item.color,
-              })}
-            >
-              <Text style={styles.actionButtonText}>✏️</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={styles.actionButton}
-              onPress={() => handleDeleteLabel(item)}
-            >
-              <Text style={styles.actionButtonText}>🗑</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+        }
       </View>
     );
   };
@@ -383,7 +383,10 @@ export const ManageLabelsScreen: React.FC = () => {
           renderItem={renderLabelItem}
           keyExtractor={(item) => item.id}
           style={styles.list}
-          contentContainerStyle={filteredLabels.length === 0 ? styles.listEmpty : undefined}
+          contentContainerStyle={[
+            { paddingBottom: lightTheme.spacing.lg },
+            filteredLabels.length === 0 ? styles.listEmpty : undefined
+          ]}
           ListEmptyComponent={renderEmpty}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
@@ -555,20 +558,28 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 24,
   },
-  labelItem: {
+  labelCard: {
+    backgroundColor: lightTheme.colors.surface,
+    borderRadius: lightTheme.ui.borderRadius.lg,
+    marginHorizontal: lightTheme.spacing.md,
+    marginVertical: lightTheme.spacing.sm,
+    padding: lightTheme.spacing.md,
+    ...lightTheme.ui.shadow.sm,
+  },
+  labelCardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: lightTheme.colors.surface,
-    paddingVertical: lightTheme.spacing.md,
-    paddingHorizontal: lightTheme.spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: lightTheme.colors.border,
-    minHeight: 72,
+    justifyContent: 'space-between',
+  },
+  labelInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
   colorChip: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
     marginRight: lightTheme.spacing.md,
   },
   labelContent: {
@@ -588,6 +599,19 @@ const styles = StyleSheet.create({
   labelActions: {
     flexDirection: 'row',
     gap: lightTheme.spacing.sm,
+  },
+  editTitle: {
+    ...lightTheme.typography.h4,
+    color: lightTheme.colors.text,
+    marginBottom: lightTheme.spacing.md,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  colorPickerLabel: {
+    ...lightTheme.typography.label,
+    color: lightTheme.colors.text,
+    marginBottom: lightTheme.spacing.sm,
+    marginTop: lightTheme.spacing.md,
   },
   actionButton: {
     width: 40,

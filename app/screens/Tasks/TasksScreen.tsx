@@ -130,22 +130,13 @@ export const TasksScreen: React.FC<TasksScreenProps> = ({
         // Normal segment filtresi (etiket yok)
         switch (selectedSegment) {
           case 'All':
-            // Tüm aktif görevler (Done gizli, showDoneInAll true ise dahil)
-            // Tüm listeleri al ve görevlerini topla
-            const allLists = await ListsRepository.getAll();
-            let allTasks: Task[] = [];
+            // Tüm görevler (liste olmayan görevler dahil)
+            filteredTasks = await TasksRepository.getAll({
+              includeCompleted: showDoneInAll
+            });
             
-            for (const list of allLists) {
-              const listTasks = await TasksRepository.getByList(list.id, {
-                includeCompleted: showDoneInAll
-              });
-              allTasks = allTasks.concat(listTasks);
-            }
-            
-            if (showDoneInAll) {
-              filteredTasks = allTasks;
-            } else {
-              filteredTasks = allTasks.filter(task => isActiveStatus(task.status));
+            if (!showDoneInAll) {
+              filteredTasks = filteredTasks.filter(task => isActiveStatus(task.status));
             }
             break;
 
@@ -171,18 +162,12 @@ export const TasksScreen: React.FC<TasksScreenProps> = ({
             break;
 
           case 'Done':
-            // Tamamlanmış görevler
-            const doneLists = await ListsRepository.getAll();
-            let doneAllTasks: Task[] = [];
+            // Tamamlanmış görevler (liste olmayan görevler dahil)
+            const allTasks = await TasksRepository.getAll({
+              includeCompleted: true
+            });
             
-            for (const list of doneLists) {
-              const listTasks = await TasksRepository.getByList(list.id, {
-                includeCompleted: true
-              });
-              doneAllTasks = doneAllTasks.concat(listTasks);
-            }
-            
-            filteredTasks = doneAllTasks.filter(task => task.status === 'done');
+            filteredTasks = allTasks.filter(task => task.status === 'done');
             
             // Tamamlanma tarihine göre sırala
             filteredTasks.sort((a, b) => {

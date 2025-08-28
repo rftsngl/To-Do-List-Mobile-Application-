@@ -30,12 +30,12 @@ import { DBCheckScreen } from './app/screens/DBCheckScreen';
 // Navigation helper
 import { Navigation } from './app/navigation/Stack';
 
-function App() {
-  const systemIsDarkMode = useColorScheme() === 'dark';
+// Theme
+import { ThemeProvider } from './app/theme/ThemeContext';
 
+function App() {
   return (
     <SafeAreaProvider>
-      <StatusBar barStyle={systemIsDarkMode ? 'light-content' : 'dark-content'} />
       <InitGate>
         <AppContent />
       </InitGate>
@@ -83,8 +83,16 @@ function AppContent() {
   };
 
   return (
-    <StackNavigator initialRoute={{ name: 'Main' }}>
-      <StackGlobalRef>
+    <ThemeProvider isDarkMode={isDarkMode} onThemeToggle={setIsDarkMode}>
+      <StatusBar 
+        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        backgroundColor={isDarkMode ? '#111827' : '#FFFFFF'}
+        translucent={false}
+        hidden={false}
+        animated={true}
+      />
+      <StackNavigator initialRoute={{ name: 'Main' }}>
+        <StackGlobalRef>
         {/* Ana Tab Ekranı */}
         <Screen name="Main">
           {() => (
@@ -150,6 +158,7 @@ function AppContent() {
         />
       </StackGlobalRef>
     </StackNavigator>
+    </ThemeProvider>
   );
 }
 

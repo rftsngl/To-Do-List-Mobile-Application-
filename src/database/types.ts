@@ -21,7 +21,7 @@ export interface List {
 
 export interface Task {
   id: string;
-  list_id: string;
+  list_id: string | null;
   title: string;
   description: string | null;
   status: TaskStatus;
@@ -89,5 +89,5 @@ export interface TaskWithSubtasks extends Task {
 export interface TaskComplete extends Task {
   labels: Label[];
   subtasks: Subtask[];
-  list: List;
+  list: List | null;
 }

@@ -20,6 +20,7 @@ import { resetAndSeed, smokeTest } from '../../../src/database';
 
 // Navigation
 import { Navigation } from '../../navigation/Stack';
+import { setGlobalActiveTab } from '../../navigation/Tabs';
 
 // Theme
 import { lightTheme } from '../../theme/theme';
@@ -105,11 +106,13 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
 
   // Manage Lists
   const handleManageLists = () => {
+    setGlobalActiveTab('Settings'); // Current tab'ı kaydet
     Navigation.push({ name: 'ManageLists' });
   };
 
   // Manage Labels  
   const handleManageLabels = () => {
+    setGlobalActiveTab('Settings'); // Current tab'ı kaydet
     Navigation.push({ name: 'ManageLabels' });
   };
 
@@ -151,8 +154,8 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
         <Text style={styles.screenTitle}>Ayarlar</Text>
 
         {/* Görünüm Ayarları */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Görünüm</Text>
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>🎨 Görünüm</Text>
           
           {renderSettingItem(
             'Karanlık Mod',
@@ -170,8 +173,8 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
         </View>
 
         {/* Görev Ayarları */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Görevler</Text>
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>✓ Görevler</Text>
           
           {renderSettingItem(
             'Listeler',
@@ -203,8 +206,8 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
         </View>
 
         {/* Uygulama Bilgileri */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Uygulama</Text>
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>📱 Uygulama</Text>
           
           {renderSettingItem(
             'Sürüm',
@@ -219,8 +222,8 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({
 
         {/* Geliştirici Araçları (sadece __DEV__) */}
         {__DEV__ && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>🛠 Geliştirici Araçları</Text>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>🛠 Geliştirici Araçları</Text>
             
             {onDBCheckPress && renderSettingItem(
               'DB Check',
@@ -290,6 +293,23 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: lightTheme.spacing.lg,
   },
+  card: {
+    backgroundColor: lightTheme.colors.surface,
+    borderRadius: lightTheme.ui.borderRadius.lg,
+    marginHorizontal: lightTheme.spacing.md,
+    marginBottom: lightTheme.spacing.md,
+    overflow: 'hidden',
+    ...lightTheme.ui.shadow.sm,
+  },
+  cardTitle: {
+    ...lightTheme.typography.h4,
+    color: lightTheme.colors.text,
+    paddingHorizontal: lightTheme.spacing.md,
+    paddingTop: lightTheme.spacing.md,
+    paddingBottom: lightTheme.spacing.sm,
+    fontSize: 16,
+    fontWeight: '600',
+  },
   sectionTitle: {
     ...lightTheme.typography.h4,
     color: lightTheme.colors.textSecondary,
@@ -302,11 +322,11 @@ const styles = StyleSheet.create({
   settingItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: lightTheme.colors.surface,
+    backgroundColor: 'transparent',
     paddingVertical: lightTheme.spacing.md,
     paddingHorizontal: lightTheme.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: lightTheme.colors.border,
+    borderBottomColor: lightTheme.colors.border + '40',
     minHeight: 60,
   },
   settingContent: {

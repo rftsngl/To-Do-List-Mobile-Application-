@@ -217,24 +217,83 @@ const migration_v1: Migration = {
 };
 
 /**
- * Gelecekteki migration örneği
+ * Migration v2: list_id alanını nullable yap
  */
 const migration_v2: Migration = {
   version: 2,
-  name: 'add_task_tags_example',
+  name: 'make_list_id_nullable',
   up: [
-    // `ALTER TABLE tasks ADD COLUMN tags TEXT NULL;`,
-    // `INSERT INTO schema_migrations (version, applied_at) 
-    //  VALUES (2, CAST((julianday('now') - 2440587.5) * 86400000 AS INTEGER));`
+    // Yeni tasks tablosu oluştur (nullable list_id ile)
+    `CREATE TABLE tasks_new (
+      id TEXT PRIMARY KEY,
+      list_id TEXT NULL,
+      title TEXT NOT NULL,
+      description TEXT NULL,
+      status TEXT NOT NULL CHECK(status IN ('todo','in_progress','blocked','done')),
+      priority INTEGER NOT NULL CHECK(priority BETWEEN 0 AND 3),
+      start_date INTEGER NULL,
+      due_date INTEGER NULL,
+      completed_at INTEGER NULL,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      deleted_at INTEGER NULL,
+      version INTEGER NOT NULL DEFAULT 0,
+      dirty INTEGER NOT NULL DEFAULT 1,
+      sort_order REAL NULL,
+      FOREIGN KEY(list_id) REFERENCES lists(id) ON DELETE SET NULL
+    );`,
+    
+    // Verileri kopyala
+    `INSERT INTO tasks_new 
+     SELECT id, list_id, title, description, status, priority, start_date, due_date, 
+            completed_at, created_at, updated_at, deleted_at, version, dirty, sort_order 
+     FROM tasks;`,
+    
+    // Eski tabloyu sil
+    `DROP TABLE tasks;`,
+    
+    // Yeni tabloyu yeniden adlandır
+    `ALTER TABLE tasks_new RENAME TO tasks;`,
+    
+    // Migration kaydını ekle
+    `INSERT INTO schema_migrations (version, applied_at) 
+     VALUES (2, CAST((julianday('now') - 2440587.5) * 86400000 AS INTEGER));`
   ],
   down: [
-    // `ALTER TABLE tasks DROP COLUMN tags;`
+    // Geri almak için eski schema'ya döndür (ancak null değerleri kaybedecek)
+    `CREATE TABLE tasks_old (
+      id TEXT PRIMARY KEY,
+      list_id TEXT NOT NULL,
+      title TEXT NOT NULL,
+      description TEXT NULL,
+      status TEXT NOT NULL CHECK(status IN ('todo','in_progress','blocked','done')),
+      priority INTEGER NOT NULL CHECK(priority BETWEEN 0 AND 3),
+      start_date INTEGER NULL,
+      due_date INTEGER NULL,
+      completed_at INTEGER NULL,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL,
+      deleted_at INTEGER NULL,
+      version INTEGER NOT NULL DEFAULT 0,
+      dirty INTEGER NOT NULL DEFAULT 1,
+      sort_order REAL NULL,
+      FOREIGN KEY(list_id) REFERENCES lists(id) ON DELETE CASCADE
+    );`,
+    
+    `INSERT INTO tasks_old 
+     SELECT id, list_id, title, description, status, priority, start_date, due_date, 
+            completed_at, created_at, updated_at, deleted_at, version, dirty, sort_order 
+     FROM tasks WHERE list_id IS NOT NULL;`,
+    
+    `DROP TABLE tasks;`,
+    `ALTER TABLE tasks_old RENAME TO tasks;`,
+    `DELETE FROM schema_migrations WHERE version = 2;`
   ]
 };
 
 export const migrations: Migration[] = [
   migration_v1,
-  // migration_v2 // İleride aktif edilecek
+  migration_v2
 ];
 
 /**

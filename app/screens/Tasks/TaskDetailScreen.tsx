@@ -77,6 +77,7 @@ export const TaskDetailScreen: React.FC<TaskDetailScreenProps> = ({
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [showCompletionBanner, setShowCompletionBanner] = useState(false);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
   const [subtaskStats, setSubtaskStats] = useState({ total: 0, done: 0 });
 
   // Veriyi yükle
@@ -113,9 +114,11 @@ export const TaskDetailScreen: React.FC<TaskDetailScreenProps> = ({
       setLabels(labelsData);
       setSubtaskStats(statsData);
 
-      // Tüm alt görevler tamamlandıysa ve ana görev done değilse banner göster
-      if (statsData.total > 0 && statsData.done === statsData.total && taskData.status !== 'done') {
+      // Tüm alt görevler tamamlandıysa ve ana görev done değilse banner göster (dismiss edilmediyse)
+      if (statsData.total > 0 && statsData.done === statsData.total && taskData.status !== 'done' && !bannerDismissed) {
         setShowCompletionBanner(true);
+      } else {
+        setShowCompletionBanner(false);
       }
 
       // Form verisini hazırla
@@ -124,7 +127,7 @@ export const TaskDetailScreen: React.FC<TaskDetailScreenProps> = ({
         description: taskData.description || '',
         status: taskData.status,
         priority: taskData.priority,
-        start_date: taskData.start_date ? formatDateYYYYMMDD(taskData.start_date) : '',
+        start_date: taskData.start_date ? formatDateYYYYMMDD(taskData.start_date) : formatDateYYYYMMDD(taskData.created_at),
         due_date: taskData.due_date ? formatDateYYYYMMDD(taskData.due_date) : '',
         list_id: taskData.list_id,
         label_ids: taskLabels.map(label => label.id),
@@ -175,6 +178,7 @@ export const TaskDetailScreen: React.FC<TaskDetailScreenProps> = ({
     try {
       await TasksRepository.update(task.id, { status: 'done' });
       setShowCompletionBanner(false);
+      setBannerDismissed(false); // Reset dismiss state
       
       // Task'ı güncelle
       const updatedTask = await TasksRepository.getById(taskId);
@@ -196,11 +200,13 @@ export const TaskDetailScreen: React.FC<TaskDetailScreenProps> = ({
   const handleSubtasksStatsUpdate = (newStats: { total: number; done: number }) => {
     setSubtaskStats(newStats);
     
-    // Banner gösterme kontrolü
-    if (task && newStats.total > 0 && newStats.done === newStats.total && task.status !== 'done') {
+    // Banner gösterme kontrolü - sadece kullanıcı daha önce dismiss etmediyse
+    if (task && newStats.total > 0 && newStats.done === newStats.total && task.status !== 'done' && !bannerDismissed) {
       setShowCompletionBanner(true);
-    } else {
+    } else if (newStats.done < newStats.total) {
+      // Alt görevler tamamlanmadıysa banner'ı kapat ve dismiss state'ini reset et
       setShowCompletionBanner(false);
+      setBannerDismissed(false);
     }
   };
 
@@ -327,139 +333,155 @@ export const TaskDetailScreen: React.FC<TaskDetailScreenProps> = ({
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Başlık */}
-        <View style={styles.field}>
-          <Text style={styles.label}>Görev Başlığı</Text>
-          <TextInput
-            style={[
-              styles.input,
-              errors.title && styles.inputError
-            ]}
-            value={formData.title}
-            onChangeText={(value) => updateField('title', value)}
-            placeholder="Görev başlığını yazın..."
-            maxLength={200}
-          />
-          {errors.title && (
-            <Text style={styles.errorText}>{errors.title}</Text>
-          )}
-        </View>
+        {/* Temel Bilgiler Kartı */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Temel Bilgiler</Text>
+          
+          {/* Başlık */}
+          <View style={styles.field}>
+            <Text style={styles.label}>Görev Başlığı</Text>
+            <TextInput
+              style={[
+                styles.input,
+                errors.title && styles.inputError
+              ]}
+              value={formData.title}
+              onChangeText={(value) => updateField('title', value)}
+              placeholder="Görev başlığını yazın..."
+              maxLength={200}
+            />
+            {errors.title && (
+              <Text style={styles.errorText}>{errors.title}</Text>
+            )}
+          </View>
 
-        {/* Açıklama */}
-        <View style={styles.field}>
-          <Text style={styles.label}>Açıklama</Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            value={formData.description}
-            onChangeText={(value) => updateField('description', value)}
-            placeholder="Görev açıklaması..."
-            multiline
-            numberOfLines={4}
-            maxLength={500}
-            textAlignVertical="top"
-          />
-        </View>
-
-        {/* Durum */}
-        <View style={styles.field}>
-          <Text style={styles.label}>Durum</Text>
-          <View style={styles.statusContainer}>
-            {getAllStatuses().map((status) => (
-              <TouchableOpacity
-                key={status.value}
-                style={[
-                  styles.statusButton,
-                  formData.status === status.value && styles.statusButtonActive,
-                  {
-                    borderColor: getStatusColor(status.value, lightTheme),
-                    backgroundColor: formData.status === status.value
-                      ? getStatusColor(status.value, lightTheme) + '20'
-                      : 'transparent'
-                  }
-                ]}
-                onPress={() => updateField('status', status.value)}
-              >
-                <Text style={[
-                  styles.statusButtonText,
-                  formData.status === status.value && {
-                    color: getStatusColor(status.value, lightTheme)
-                  }
-                ]}>
-                  {status.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
+          {/* Açıklama */}
+          <View style={styles.field}>
+            <Text style={styles.label}>Açıklama</Text>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              value={formData.description}
+              onChangeText={(value) => updateField('description', value)}
+              placeholder="Görev açıklaması..."
+              multiline
+              numberOfLines={4}
+              maxLength={500}
+              textAlignVertical="top"
+            />
           </View>
         </View>
 
-        {/* Öncelik */}
-        <View style={styles.field}>
-          <Text style={styles.label}>Öncelik</Text>
-          <View style={styles.priorityContainer}>
-            {getAllPriorities().map((priority) => (
-              <TouchableOpacity
-                key={priority.value}
-                style={[
-                  styles.priorityButton,
-                  formData.priority === priority.value && styles.priorityButtonActive,
-                  {
-                    borderColor: getPriorityColor(priority.value, lightTheme),
-                    backgroundColor: formData.priority === priority.value
-                      ? getPriorityColor(priority.value, lightTheme) + '20'
-                      : 'transparent'
-                  }
-                ]}
-                onPress={() => updateField('priority', priority.value)}
-              >
-                <Text style={[
-                  styles.priorityButtonText,
-                  formData.priority === priority.value && {
-                    color: getPriorityColor(priority.value, lightTheme)
-                  }
-                ]}>
-                  {priority.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
+        {/* Durum ve Öncelik Kartı */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Durum ve Öncelik</Text>
+          
+          {/* Durum */}
+          <View style={styles.field}>
+            <Text style={styles.label}>Durum</Text>
+            <View style={styles.statusContainer}>
+              {getAllStatuses().map((status) => (
+                <TouchableOpacity
+                  key={status.value}
+                  style={[
+                    styles.statusButton,
+                    formData.status === status.value && styles.statusButtonActive,
+                    {
+                      borderColor: getStatusColor(status.value, lightTheme),
+                      backgroundColor: formData.status === status.value
+                        ? getStatusColor(status.value, lightTheme) + '20'
+                        : 'transparent'
+                    }
+                  ]}
+                  onPress={() => updateField('status', status.value)}
+                >
+                  <Text style={[
+                    styles.statusButtonText,
+                    formData.status === status.value && {
+                      color: getStatusColor(status.value, lightTheme)
+                    }
+                  ]}>
+                    {status.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          {/* Öncelik */}
+          <View style={styles.field}>
+            <Text style={styles.label}>Öncelik</Text>
+            <View style={styles.priorityContainer}>
+              {getAllPriorities().map((priority) => (
+                <TouchableOpacity
+                  key={priority.value}
+                  style={[
+                    styles.priorityButton,
+                    formData.priority === priority.value && styles.priorityButtonActive,
+                    {
+                      borderColor: getPriorityColor(priority.value, lightTheme),
+                      backgroundColor: formData.priority === priority.value
+                        ? getPriorityColor(priority.value, lightTheme) + '20'
+                        : 'transparent'
+                    }
+                  ]}
+                  onPress={() => updateField('priority', priority.value)}
+                >
+                  <Text style={[
+                    styles.priorityButtonText,
+                    formData.priority === priority.value && {
+                      color: getPriorityColor(priority.value, lightTheme)
+                    }
+                  ]}>
+                    {priority.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
         </View>
 
-        {/* Başlangıç Tarihi */}
-        <View style={styles.field}>
-          <Text style={styles.label}>Başlangıç Tarihi</Text>
-          <TextInput
-            style={[
-              styles.input,
-              errors.start_date && styles.inputError
-            ]}
-            value={formData.start_date}
-            onChangeText={(value) => updateField('start_date', value)}
-            placeholder="YYYY-MM-DD"
-            maxLength={10}
-            keyboardType="numeric"
-          />
-          {errors.start_date && (
-            <Text style={styles.errorText}>{errors.start_date}</Text>
-          )}
-        </View>
+        {/* Tarihler Kartı */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Tarihler</Text>
+          
+          {/* Başlangıç Tarihi */}
+          <View style={styles.field}>
+            <Text style={styles.label}>Başlangıç Tarihi</Text>
+            <TextInput
+              style={[
+                styles.input,
+                errors.start_date && styles.inputError
+              ]}
+              value={formData.start_date}
+              onChangeText={(value) => updateField('start_date', value)}
+              placeholder="YYYY-MM-DD"
+              maxLength={10}
+              keyboardType="numeric"
+              editable={false}
+            />
+            {errors.start_date && (
+              <Text style={styles.errorText}>{errors.start_date}</Text>
+            )}
+          </View>
 
-        {/* Bitiş Tarihi */}
-        <View style={styles.field}>
-          <Text style={styles.label}>Vade Tarihi</Text>
-          <TextInput
-            style={[
-              styles.input,
-              errors.due_date && styles.inputError
-            ]}
-            value={formData.due_date}
-            onChangeText={(value) => updateField('due_date', value)}
-            placeholder="YYYY-MM-DD"
-            maxLength={10}
-            keyboardType="numeric"
-          />
-          {errors.due_date && (
-            <Text style={styles.errorText}>{errors.due_date}</Text>
-          )}
+          {/* Bitiş Tarihi */}
+          <View style={styles.field}>
+            <Text style={styles.label}>Vade Tarihi</Text>
+            <TextInput
+              style={[
+                styles.input,
+                errors.due_date && styles.inputError
+              ]}
+              value={formData.due_date}
+              onChangeText={(value) => updateField('due_date', value)}
+              placeholder="YYYY-MM-DD"
+              maxLength={10}
+              keyboardType="numeric"
+            />
+            {errors.due_date && (
+              <Text style={styles.errorText}>{errors.due_date}</Text>
+            )}
+          </View>
         </View>
 
         {/* Liste Seçimi */}
@@ -561,7 +583,10 @@ export const TaskDetailScreen: React.FC<TaskDetailScreenProps> = ({
           <View style={styles.completionBannerActions}>
             <TouchableOpacity
               style={styles.completionBannerButton}
-              onPress={() => setShowCompletionBanner(false)}
+              onPress={() => {
+                setShowCompletionBanner(false);
+                setBannerDismissed(true);
+              }}
             >
               <Text style={styles.completionBannerButtonText}>Hayır</Text>
             </TouchableOpacity>
@@ -600,6 +625,20 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: lightTheme.spacing.md,
     paddingBottom: lightTheme.spacing.xxl,
+  },
+  card: {
+    backgroundColor: lightTheme.colors.surface,
+    borderRadius: lightTheme.ui.borderRadius.lg,
+    padding: lightTheme.spacing.md,
+    marginBottom: lightTheme.spacing.md,
+    ...lightTheme.ui.shadow.sm,
+  },
+  cardTitle: {
+    ...lightTheme.typography.h4,
+    color: lightTheme.colors.text,
+    marginBottom: lightTheme.spacing.md,
+    fontSize: 16,
+    fontWeight: '600',
   },
   deleteButton: {
     width: lightTheme.ui.minTouchTarget,

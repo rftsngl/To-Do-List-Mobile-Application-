@@ -19,6 +19,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { lightTheme } from '../theme/theme';
+import { useTheme } from '../theme/ThemeContext';
 
 const { height: screenHeight } = Dimensions.get('window');
 
@@ -38,6 +39,7 @@ export const Sheet: React.FC<SheetProps> = ({
   height = screenHeight * 0.6, // Varsayılan: %60 ekran
   closeOnBackdrop = true,
 }) => {
+  const { theme } = useTheme();
   const safeAreaInsets = useSafeAreaInsets();
   const translateY = useRef(new Animated.Value(screenHeight)).current;
   const opacity = useRef(new Animated.Value(0)).current;
@@ -92,11 +94,12 @@ export const Sheet: React.FC<SheetProps> = ({
     >
       <KeyboardAvoidingView
         style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
       >
         {/* Backdrop */}
         <TouchableWithoutFeedback onPress={handleBackdropPress}>
-          <Animated.View style={[styles.backdrop, { opacity }]} />
+          <Animated.View style={[styles.backdrop, { opacity, backgroundColor: theme.colors.overlay }]} />
         </TouchableWithoutFeedback>
 
         {/* Sheet Content */}
@@ -106,12 +109,13 @@ export const Sheet: React.FC<SheetProps> = ({
             {
               height: sheetHeight,
               transform: [{ translateY }],
-              paddingBottom: safeAreaInsets.bottom || lightTheme.spacing.md,
+              paddingBottom: safeAreaInsets.bottom || theme.spacing.md,
+              backgroundColor: theme.colors.surface,
             },
           ]}
         >
           {/* Handle */}
-          <View style={styles.handle} />
+          <View style={[styles.handle, { backgroundColor: theme.colors.borderSecondary }]} />
 
           {/* Content */}
           <View style={styles.content}>
@@ -148,14 +152,22 @@ export const SheetWithHeader: React.FC<SheetWithHeaderProps> = ({
   children,
   ...props
 }) => {
+  const { theme } = useTheme();
+  
   return (
     <Sheet {...props}>
       {(title || showCloseButton) && (
-        <View style={styles.header}>
+        <View style={[styles.header, { borderBottomColor: theme.colors.border }]}>
           <View style={styles.headerContent}>
             {title && (
               <View style={styles.titleContainer}>
-                <Text style={styles.headerTitle}>{title}</Text>
+                <Text 
+                  style={[styles.headerTitle, { color: theme.colors.text }]}
+                  numberOfLines={2}
+                  ellipsizeMode="tail"
+                >
+                  {title}
+                </Text>
               </View>
             )}
             {showCloseButton && (
@@ -165,7 +177,7 @@ export const SheetWithHeader: React.FC<SheetWithHeaderProps> = ({
                 accessibilityRole="button"
                 accessibilityLabel="Kapat"
               >
-                <Text style={styles.closeButtonText}>✕</Text>
+                <Text style={[styles.closeButtonText, { color: theme.colors.textSecondary }]}>✕</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -234,9 +246,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
-    ...lightTheme.typography.h4,
+    fontSize: 16,
+    fontWeight: '600',
+    lineHeight: 20,
     color: lightTheme.colors.text,
     textAlign: 'center',
+    flexShrink: 1,
   },
   closeButton: {
     width: lightTheme.ui.minTouchTarget,

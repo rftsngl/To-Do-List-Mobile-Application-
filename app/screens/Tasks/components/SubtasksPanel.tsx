@@ -350,12 +350,12 @@ export const SubtasksPanel: React.FC<SubtasksPanelProps> = ({ taskId, onStatsUpd
     const currentIndex = subtasks.findIndex(s => s.id === subtaskId);
     if (currentIndex <= 0) return;
 
-    const beforeSubtask = subtasks[currentIndex - 1];
+    const targetSubtask = subtasks[currentIndex - 1];
     
     try {
       await SubtasksRepository.move({
         subtaskId,
-        beforeId: beforeSubtask.id
+        afterId: targetSubtask.id
       });
       await loadSubtasks();
     } catch (err) {
@@ -369,12 +369,12 @@ export const SubtasksPanel: React.FC<SubtasksPanelProps> = ({ taskId, onStatsUpd
     const currentIndex = subtasks.findIndex(s => s.id === subtaskId);
     if (currentIndex >= subtasks.length - 1) return;
 
-    const afterSubtask = subtasks[currentIndex + 1];
+    const targetSubtask = subtasks[currentIndex + 1];
     
     try {
       await SubtasksRepository.move({
         subtaskId,
-        afterId: afterSubtask.id
+        beforeId: targetSubtask.id
       });
       await loadSubtasks();
     } catch (err) {

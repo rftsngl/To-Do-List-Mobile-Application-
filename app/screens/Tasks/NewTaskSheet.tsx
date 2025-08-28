@@ -34,6 +34,9 @@ import { getAllPriorities } from '../../utils/status';
 // Theme
 import { lightTheme, getPriorityColor } from '../../theme/theme';
 
+// Navigation
+import { Navigation } from '../../navigation/Stack';
+
 const { height: screenHeight } = Dimensions.get('window');
 
 interface NewTaskSheetProps {
@@ -376,7 +379,10 @@ export const NewTaskSheet: React.FC<NewTaskSheetProps> = ({
             <Text style={styles.label}>
               Liste
             </Text>
-            <TouchableOpacity style={styles.addButton} onPress={() => {}}>
+            <TouchableOpacity style={styles.addButton} onPress={() => {
+              onClose();
+              setTimeout(() => Navigation.push({ name: 'ManageLists' }), 300);
+            }}>
               <Text style={styles.addButtonText}>+ Liste Ekle</Text>
             </TouchableOpacity>
           </View>
@@ -412,7 +418,10 @@ export const NewTaskSheet: React.FC<NewTaskSheetProps> = ({
         <View style={styles.field}>
           <View style={styles.fieldHeader}>
             <Text style={styles.label}>Etiketler</Text>
-            <TouchableOpacity style={styles.addButton} onPress={() => {}}>
+            <TouchableOpacity style={styles.addButton} onPress={() => {
+              onClose();
+              setTimeout(() => Navigation.push({ name: 'ManageLabels' }), 300);
+            }}>
               <Text style={styles.addButtonText}>+ Etiket Ekle</Text>
             </TouchableOpacity>
           </View>
@@ -616,7 +625,9 @@ const styles = StyleSheet.create({
     backgroundColor: lightTheme.colors.textDisabled,
   },
   saveButtonText: {
-    ...lightTheme.typography.button,
+    fontSize: 14,
+    fontWeight: '600',
+    lineHeight: 18,
     color: lightTheme.colors.surface,
   },
 });
